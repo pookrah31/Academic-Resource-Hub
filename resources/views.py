@@ -18,11 +18,13 @@ class MaterialListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         #This links the upload to the logged-in student
-        serializer.save(user=self.request.user)
+        serializer.save(uploader=self.request.user, user=self.request.user)
 
 class CourseListView(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class UpvoteMaterialView(APIView):
     permission_classes = [permissions.IsAuthenticated] # Only logged-in students can vote

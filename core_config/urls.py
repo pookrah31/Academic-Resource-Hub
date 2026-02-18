@@ -22,6 +22,8 @@ from  rest_framework_simplejwt.views import (
 )
 
 from users.views import RegisterView
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     # This connects the 'resources' app to the web
@@ -29,4 +31,8 @@ urlpatterns = [
     path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/register/', RegisterView.as_view(), name='auth_register'),
-]
+    path('api/auth/', include('users.urls')),
+]  
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

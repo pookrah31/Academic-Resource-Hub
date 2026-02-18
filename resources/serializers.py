@@ -9,11 +9,11 @@ class CourseSerializer(serializers.ModelSerializer):
 class MaterialSerializer(serializers.ModelSerializer):
     # These lines help show names instead of just ID numbers
     course_name =serializers.ReadOnlyField(source='course.course_name')
-    uploader_name = serializers.ReadOnlyField(source='user.username')
+    uploader_name = serializers.ReadOnlyField(source='uploader.username')
 
     class Meta:
         model = Material
-        fields = ['id', 'title', 'file_url', 'vote_count', 'user', 'course', 'course_name', 'uploader_name'] 
+        fields = ['id', 'title', 'file_url', 'vote_count', 'user', 'course', 'course_name', 'uploader_name', 'created_at'] 
         read_only_fields = ['user', 'vote_count']
 
 

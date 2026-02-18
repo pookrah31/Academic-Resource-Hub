@@ -17,3 +17,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             level=validated_data.get('level', 100)
         )
         return user
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # Make sure these match the fields in your models.py!
+        fields = ['id', 'username', 'email', 'department', 'level']
