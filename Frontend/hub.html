@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academic Resource Hub</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --primary-blue: #0d6efd; --dark-bg: #1a1d20; }
@@ -21,7 +22,9 @@
         <div class="container d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="fw-bold m-0 text-white">🎓 Academic Hub</h1>
-                <p class="small text-muted mb-0" id="welcome-msg">Welcome, Guest</p>
+               <p class="small text-light mb-0" id="welcome-msg" style="transition: opacity 0.5s ease;">
+    Connecting Students to Knowledge.
+</p>
             </div>
             <div id="auth-buttons">
                 <button class="btn btn-outline-light btn-sm" onclick="switchSection('login')">Login</button>
@@ -228,9 +231,11 @@
     }
 }
 
-      async function loadProfile() {
+     async function loadProfile() {
     const token = localStorage.getItem('accessToken');
-    if (!token) return; // Exit if not logged in
+    const welcomeEl = document.getElementById('welcome-msg');
+    
+    if (!token) return; // The slogan rotation handles the guest view
 
     const res = await fetch(`${BASE_URL}/api/auth/profile/`, { 
         headers: {'Authorization': `Bearer ${token}`}
@@ -239,12 +244,14 @@
     if(res.ok) {
         const d = await res.json();
         
-        // --- ADD THESE 3 LINES TO UPDATE THE HEADER ---
-        document.getElementById('welcome-msg').innerText = `Hello, ${d.username}`;
-        document.getElementById('auth-buttons').classList.add('hidden'); // Hides Login/Sign Up
-        document.getElementById('logout-btn').classList.remove('hidden'); // Shows Logout
-        // ----------------------------------------------
+        // --- 1. Header Updates (Personalized & Bold) ---
+        // Using innerHTML so the span color works
+        welcomeEl.innerHTML = `👋 Welcome back, <span class="text-info fw-bold">${d.username}</span>! Ready to study?`;
+        
+        document.getElementById('auth-buttons').classList.add('hidden');
+        document.getElementById('logout-btn').classList.remove('hidden');
 
+        // --- 2. Profile Card Updates ---
         document.getElementById('prof-name').innerText = d.username;
         document.getElementById('prof-dept').innerText = d.department || "N/A";
         document.getElementById('prof-level').innerText = d.level || "N/A";
@@ -253,7 +260,7 @@
         const imgUrl = d.profile_pic ? d.profile_pic : 'https://via.placeholder.com/150';
         document.getElementById('prof-img').src = imgUrl;
 
-        // Badge Logic
+        // --- 3. Badge Logic ---
         const pts = d.contribution_points || 0;
         let badgeHtml = '';
         if (pts >= 5) {
@@ -385,6 +392,37 @@ async function loadMaterials() {
         alert("A network error occurred.");
     }
         }
+
+        // 1. Define your Slogans
+const slogans = [
+    "🚀 Fueling Academic Excellence.",
+    "📚 Your Campus, Your Resources.",
+    "💡 Knowledge Sharing Made Simple.",
+    "🎓 Built by Students, for Students.",
+    "✨ Access the Best Study Materials Instantly."
+];
+
+let sloganIndex = 0;
+
+function rotateSlogans() {
+    const token = localStorage.getItem('accessToken');
+    const welcomeEl = document.getElementById('welcome-msg');
+
+    // Only rotate if the user is NOT logged in
+    if (!token) {
+        welcomeEl.style.opacity = 0; // Fade out
+        setTimeout(() => {
+            welcomeEl.innerText = slogans[sloganIndex];
+            welcomeEl.style.opacity = 1; // Fade in
+            sloganIndex = (sloganIndex + 1) % slogans.length;
+        }, 500);
+    }
+}
+
+// Start rotation every 4 seconds
+setInterval(rotateSlogans, 4000);
+// Run once on load to set the first slogan
+rotateSlogans();
     </script>
 </body>
 </html>
