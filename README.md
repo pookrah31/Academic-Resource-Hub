@@ -1,37 +1,36 @@
-Academic Resource Hub 🎓
-A specialized platform for university students to share and access course-specific academic materials.
+🎓 Academic Resource Hub
+A full-stack specialized platform for university students to share, organize, and access course-specific academic materials.
 
 📝 Project Overview
-The Academic Resource Hub is a RESTful API designed to solve the problem of disorganized study materials. It provides a centralized repository where students can upload and download lecture notes, past questions, and handouts linked directly to their university course codes.
+The Academic Resource Hub is a comprehensive web application designed to solve the problem of disorganized study materials. It provides a centralized repository where students can upload and download lecture notes, past questions, and handouts linked directly to their university course codes.
 
-This project is a Portfolio Project for the ALX Software Engineering program.
+This project is the Capstone Portfolio Project for the ALX Software Engineering program.
 
 🚀 Key Features
-Custom User Authentication: Extended Django's AbstractUser to include student-specific fields like Department and Academic Level.
+Single Page Application (SPA): A fast, responsive frontend built with Vanilla JavaScript and Bootstrap 5.
 
-JWT Security: Implemented JSON Web Tokens (SimpleJWT) to secure the API, ensuring only authenticated students can contribute resources.
+JWT Security: Implemented stateless authentication using JSON Web Tokens (SimpleJWT).
 
-Course-Resource Mapping: A structured database linking study materials to specific courses (e.g., CS 401).
+Dynamic Grouping: Resources are automatically categorized by Course Code for a structured, folder-like user experience.
 
-Admin Management: A customized Django Admin dashboard for content moderation and user oversight.
+Gamification & Badges: A contribution-based system where students earn badges (Newcomer, Star Contributor, Academic Legend) based on their uploads.
+
+Personalized Dashboard: Includes a user profile, department/level tracking, and profile picture support.
+
+Interactive Header: Features a rotating slogan system for guests and a personalized greeting for logged-in students.
+
+Search & Filtering: Real-time filtering of resources by Course Code.
 
 🛠️ Technical Stack
-Backend Framework: Django & Django REST Framework (DRF)
+Backend: Django & Django REST Framework (DRF)
 
-Database: SQLite (File-based database for development)
+Frontend: JavaScript (ES6+), HTML5, Bootstrap 5
 
-Security: Stateless authentication using JWT
+Database: SQLite
 
-Language: Python 3.14
+Image Processing: Pillow
 
-🏗️ System Architecture
-The project follows a decoupled API architecture:
-
-Models: Custom User (AbstractUser), Course, and Material.
-
-Serializers: Data translation between Python objects and JSON.
-
-Permissions: IsAuthenticatedOrReadOnly ensures the API is publicly readable but requires a token for uploads.
+Security: Stateless JWT Authentication
 
 ⚙️ Setup & Installation
 1. Clone and Navigate
@@ -40,41 +39,37 @@ git clone https://github.com/pookrah31/Academic-Resource-Hub.git
 cd Academic-Resource-Hub
 2. Environment Setup
 Bash
-# Activate Virtual Environment (Git Bash)
-source venv/Scripts/activate
+# Create and Activate Virtual Environment
+python -m venv venv
+source venv/Scripts/activate  # On Windows use: venv\Scripts\activate
 
 # Install Necessary Packages
-pip install django djangorestframework django-cors-headers djangorestframework-simplejwt
+pip install -r requirements.txt
 3. Database Initialization
 Bash
-# Build the SQLite database based on the AbstractUser and Resource models
-python manage.py makemigrations users
-python manage.py makemigrations resources
+python manage.py makemigrations
 python manage.py migrate
-4. Run the API
+4. Run the Application
 Bash
 python manage.py runserver
+The API will be available at http://127.0.0.1:8000/api/ and the frontend can be accessed via index.html.
+
 📍 API Endpoints
 🔐 Authentication
-POST /api/token/ - Login with credentials to receive Access & Refresh tokens.
+POST /api/register/ - Create a new student account.
 
-POST /api/token/refresh/ - Refresh an expired access token.
+POST /api/login/ - Login to receive JWT Access & Refresh tokens.
+
+GET /api/auth/profile/ - Retrieve or update current user profile (Supports PATCH for profile pictures).
 
 📚 Resources
-GET /api/materials/ - View the list of all uploaded materials.
+GET /api/materials/ - View materials (Supports ?course__course_code= filtering).
 
-POST /api/materials/ - Upload a new academic resource (JWT Token Required).
+POST /api/materials/ - Upload new resource (Requires JWT).
 
-GET /api/courses/ - View available courses.
+POST /api/materials/{id}/upvote/ - Upvote a resource to improve its quality ranking.
 
-🤝 Project Status
-This project is currently in Week 2 of development. Upcoming features include:
-
-Student Registration Endpoint: Allowing users to create accounts via the API.
-
-Search & Filtering: Finding materials by Course Code or Title.
-
-Voting System: Upvote/Downvote logic for quality control.
+GET/POST /api/courses/ - View or register new course codes.
 
 📄 License
-MIT License - Developed by Peniel Osei Okrah. 
+MIT License - Developed by Peniel Osei Okrah.
