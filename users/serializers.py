@@ -20,5 +20,4 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # Make sure these match the fields in your models.py!
-        fields = ['id', 'username', 'email', 'department', 'level']
+        fields = ['id', 'username', 'email', 'department', 'level', 'profile_pic', 'contribution_points']

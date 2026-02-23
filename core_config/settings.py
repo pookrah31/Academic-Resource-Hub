@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

@@ -3,6 +3,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from .serializers import RegisterSerializer, UserProfileSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -19,9 +20,11 @@ class RegisterView(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class UserProfileView(generics.RetrieveAPIView):
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    parser_classes = (MultiPartParser, FormParser)
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated]
+   
 
     def get_object(self):
         return self.request.user

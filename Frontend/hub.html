@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Resource Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --primary-blue: #0d6efd; --dark-bg: #1a1d20; }
+        .hidden { display: none !important; }
+        .hero-section { background: var(--dark-bg); color: white; padding: 2.5rem 0; border-bottom: 5px solid var(--primary-blue); }
+        .nav-link { cursor: pointer; font-weight: 600; color: #6c757d; border: none !important; transition: 0.3s; }
+        .nav-link.active { color: var(--primary-blue) !important; border-bottom: 3px solid var(--primary-blue) !important; background: transparent !important; }
+        .card { border: none; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 12px; }
+        .section-content { padding-top: 2rem; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <header class="hero-section mb-0">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="fw-bold m-0 text-white">🎓 Academic Hub</h1>
+                <p class="small text-muted mb-0" id="welcome-msg">Welcome, Guest</p>
+            </div>
+            <div id="auth-buttons">
+                <button class="btn btn-outline-light btn-sm" onclick="switchSection('login')">Login</button>
+                <button class="btn btn-primary btn-sm" onclick="switchSection('register')">Sign Up</button>
+            </div>
+            <button id="logout-btn" class="btn btn-outline-danger btn-sm hidden" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-sm sticky-top">
+        <div class="container">
+            <ul class="nav nav-tabs border-0 pt-2">
+                <li class="nav-item"><a class="nav-link active" id="tab-feed" onclick="switchSection('feed')">📚 Library</a></li>
+                <li class="nav-item"><a class="nav-link" id="tab-upload" onclick="switchSection('upload')">📤 Contribute</a></li>
+                <li class="nav-item"><a class="nav-link" id="tab-profile" onclick="switchSection('profile')">👤 My Profile</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        
+        <div id="login-required-msg" class="text-center p-5 hidden">
+            <div class="display-1 mb-3">🔒</div>
+            <h3 class="fw-bold">Member Access Only</h3>
+            <p class="text-muted">Please sign in to view the academic library or contribute resources.</p>
+            <button class="btn btn-primary mt-2" onclick="switchSection('login')">Sign In Now</button>
+        </div>
+
+        <section id="section-feed" class="section-content hidden">
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-7"><h3>Study Materials</h3></div>
+                <div class="col-md-5">
+                    <input type="text" id="search" class="form-control" placeholder="🔍 Search Course Code..." onkeyup="loadMaterials()">
+                </div>
+            </div>
+            <div id="materials-grid" class="row"></div>
+        </section>
+
+        <section id="section-register" class="section-content hidden">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <div class="card p-4 border-top border-primary border-4 shadow">
+                        <h4 class="fw-bold">Create Student Account</h4>
+                        <hr>
+                        <input type="text" id="reg-user" class="form-control mb-2" placeholder="Username">
+                        <input type="password" id="reg-pass" class="form-control mb-2" placeholder="Password">
+                        <input type="text" id="reg-dept" class="form-control mb-2" placeholder="Department">
+                        <input type="number" id="reg-level" class="form-control mb-3" placeholder="Level">
+                        <button onclick="handleRegister()" class="btn btn-primary w-100 fw-bold">Sign Up</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-login" class="section-content hidden">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card p-4 shadow">
+                        <h4 class="fw-bold text-center">Login</h4>
+                        <hr>
+                        <div id="login-error" class="alert alert-danger hidden small">Incorrect credentials.</div>
+                        <input type="text" id="log-user" class="form-control mb-2" placeholder="Username">
+                        <input type="password" id="log-pass" class="form-control mb-3" placeholder="Password">
+                        <button onclick="handleLogin()" class="btn btn-primary w-100 fw-bold">Sign In</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-upload" class="section-content hidden">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card p-4 border-top border-warning border-4 shadow">
+                        <h4 class="fw-bold">Step 1: Add Course</h4>
+                        <p class="small text-muted">If the course isn't in the list, add it here first.</p>
+                        <input type="text" id="new-course-code" class="form-control mb-2" placeholder="Code (e.g. CS 402)">
+                        <input type="text" id="new-course-name" class="form-control mb-3" placeholder="Name (e.g. Networking)">
+                        <button onclick="handleAddCourse()" class="btn btn-warning w-100 fw-bold text-dark">Register Course</button>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card p-4 border-top border-success border-4 shadow">
+                        <h4 class="fw-bold">Step 2: Upload File</h4>
+                        <input type="text" id="up-title" class="form-control mb-2" placeholder="Title">
+                        <select id="up-course" class="form-select mb-2"></select>
+                        <input type="file" id="up-file" class="form-control mb-3">
+                        <button id="upload-btn" onclick="handleUpload()" class="btn btn-success w-100 fw-bold">Publish to Hub</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+     <section id="section-profile" class="section-content hidden">
+    <div class="row justify-content-center text-center">
+        <div class="col-md-6">
+            <div class="card p-5 shadow-lg border-0">
+                <img id="prof-img" src="" class="rounded-circle mx-auto mb-3 border border-3 border-primary" 
+                     style="width: 120px; height: 120px; object-fit: cover;">
+                
+                <h2 id="prof-name" class="fw-bold text-primary text-uppercase mb-0">---</h2>
+                
+                <div id="badge-container" class="mt-2 mb-3"></div>
+                
+                <hr>
+                <div class="row text-start px-3">
+                    <div class="col-6 text-muted">Department:</div>
+                    <div class="col-6 fw-bold text-end" id="prof-dept">---</div>
+                    <div class="col-6 text-muted mt-2">Level:</div>
+                    <div class="col-6 fw-bold text-end mt-2" id="prof-level">---</div>
+                </div>
+                <div class="mt-4 p-3 bg-light rounded shadow-sm">
+    <h6 class="fw-bold mb-3">Update Profile Picture</h6>
+    <div class="input-group">
+        <input type="file" id="up-profile-pic" class="form-control form-control-sm">
+        <button onclick="handleProfilePicUpload()" class="btn btn-primary btn-sm">Upload</button>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</section>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://127.0.0.1:8000';
+
+        function switchSection(id) {
+            const token = localStorage.getItem('accessToken');
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById('login-required-msg').classList.add('hidden');
+            document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+
+            if (id === 'login' || id === 'register') {
+                document.getElementById(`section-${id}`).classList.remove('hidden');
+                return;
+            }
+
+            if (!token) {
+                document.getElementById('login-required-msg').classList.remove('hidden');
+                document.getElementById(`tab-${id}`).classList.add('active');
+            } else {
+                document.getElementById(`section-${id}`).classList.remove('hidden');
+                document.getElementById(`tab-${id}`).classList.add('active');
+                if(id === 'feed') loadMaterials();
+                if(id === 'upload') loadCourses();
+                if(id === 'profile') loadProfile();
+            }
+        }
+
+        async function handleAddCourse() {
+            const token = localStorage.getItem('accessToken');
+            const data = {
+                course_code: document.getElementById('new-course-code').value,
+                course_name: document.getElementById('new-course-name').value
+            };
+            const res = await fetch(`${BASE_URL}/api/courses/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(data)
+            });
+            if(res.ok) { 
+                alert("Course Added!"); 
+                document.getElementById('new-course-code').value = '';
+                document.getElementById('new-course-name').value = '';
+                loadCourses(); 
+            }
+        }
+
+        async function handleRegister() {
+            const payload = {
+                username: document.getElementById('reg-user').value,
+                password: document.getElementById('reg-pass').value,
+                department: document.getElementById('reg-dept').value,
+                level: document.getElementById('reg-level').value
+            };
+            const res = await fetch(`${BASE_URL}/api/register/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if(res.ok) { alert("Registration Success!"); switchSection('login'); }
+        }
+
+       async function handleLogin() {
+    const payload = { 
+        username: document.getElementById('log-user').value, 
+        password: document.getElementById('log-pass').value 
+    };
+    const res = await fetch(`${BASE_URL}/api/login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if(res.ok) {
+        const json = await res.json();
+        localStorage.setItem('accessToken', json.access);
+        
+        // IMPORTANT: Call loadProfile immediately so the buttons change!
+        await loadProfile(); 
+        switchSection('feed'); 
+    } else { 
+        document.getElementById('login-error').classList.remove('hidden'); 
+    }
+}
+
+      async function loadProfile() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return; // Exit if not logged in
+
+    const res = await fetch(`${BASE_URL}/api/auth/profile/`, { 
+        headers: {'Authorization': `Bearer ${token}`}
+    });
+
+    if(res.ok) {
+        const d = await res.json();
+        
+        // --- ADD THESE 3 LINES TO UPDATE THE HEADER ---
+        document.getElementById('welcome-msg').innerText = `Hello, ${d.username}`;
+        document.getElementById('auth-buttons').classList.add('hidden'); // Hides Login/Sign Up
+        document.getElementById('logout-btn').classList.remove('hidden'); // Shows Logout
+        // ----------------------------------------------
+
+        document.getElementById('prof-name').innerText = d.username;
+        document.getElementById('prof-dept').innerText = d.department || "N/A";
+        document.getElementById('prof-level').innerText = d.level || "N/A";
+        
+        // Handle Profile Picture
+        const imgUrl = d.profile_pic ? d.profile_pic : 'https://via.placeholder.com/150';
+        document.getElementById('prof-img').src = imgUrl;
+
+        // Badge Logic
+        const pts = d.contribution_points || 0;
+        let badgeHtml = '';
+        if (pts >= 5) {
+            badgeHtml = '<span class="badge bg-warning text-dark">🏆 Academic Legend</span>';
+        } else if (pts >= 3) {
+            badgeHtml = '<span class="badge bg-info text-dark">🔵 Star Contributor</span>';
+        } else {
+            badgeHtml = '<span class="badge bg-secondary">🟢 Newcomer</span>';
+        }
+        document.getElementById('badge-container').innerHTML = badgeHtml;
+    }
+}
+async function loadMaterials() {
+    const token = localStorage.getItem('accessToken');
+    const query = document.getElementById('search').value;
+    const res = await fetch(`${BASE_URL}/api/materials/?course__course_code=${query}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const grid = document.getElementById('materials-grid');
+    
+    if (data.length === 0) {
+        grid.innerHTML = '<p class="text-center text-muted mt-5">No resources found.</p>';
+        return;
+    }
+
+    // 1. Group the materials by Course Name
+    const grouped = data.reduce((acc, material) => {
+        const key = material.course_name;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(material);
+        return acc;
+    }, {});
+
+    // 2. Build the HTML with Course Headings
+    let finalHtml = '';
+    for (const course in grouped) {
+        finalHtml += `
+            <div class="col-12 mt-4 mb-2">
+                <h4 class="fw-bold text-primary border-bottom pb-2">📂 ${course}</h4>
+            </div>
+            <div class="row">
+                ${grouped[course].map(m => {
+                    const fileUrl = m.file_url.startsWith('http') ? m.file_url : `${BASE_URL}${m.file_url}`;
+                    return `
+                    <div class="col-md-4 mb-3">
+                        <div class="card p-3 h-100 shadow-sm border-0 bg-white">
+                            <h6 class="fw-bold mb-1">${m.title}</h6>
+                            <p class="small text-muted">Uploaded: ${new Date(m.created_at).toLocaleDateString()}</p>
+                            <div class="mt-auto d-flex justify-content-between pt-2">
+                                <a href="${fileUrl}" target="_blank" download="${m.title}" class="btn btn-sm btn-primary">Download</a>
+                                <button onclick="upvote(${m.id})" class="btn btn-sm btn-outline-success border-0">⭐ ${m.vote_count}</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+    }
+    grid.innerHTML = finalHtml;
+}
+
+        async function handleUpload() {
+            const token = localStorage.getItem('accessToken');
+            const btn = document.getElementById('upload-btn');
+            const file = document.getElementById('up-file').files[0];
+            if(!file) return alert("Select a file first");
+
+            btn.disabled = true; btn.innerText = "Uploading...";
+            const formData = new FormData();
+            formData.append('title', document.getElementById('up-title').value);
+            formData.append('course', document.getElementById('up-course').value);
+            formData.append('file_url', file);
+
+            const res = await fetch(`${BASE_URL}/api/materials/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            if(res.ok) { alert("Published!"); switchSection('feed'); }
+            btn.disabled = false; btn.innerText = "Publish";
+        }
+
+        async function upvote(id) {
+            const token = localStorage.getItem('accessToken');
+            await fetch(`${BASE_URL}/api/materials/${id}/upvote/`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+            loadMaterials();
+        }
+
+        async function loadCourses() {
+            const res = await fetch(`${BASE_URL}/api/courses/`);
+            const data = await res.json();
+            document.getElementById('up-course').innerHTML = data.map(c => `<option value="${c.id}">${c.course_code}</option>`).join('');
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+
+        if(localStorage.getItem('accessToken')) { loadProfile(); switchSection('feed'); } 
+        else { switchSection('feed'); }
+
+
+        async function handleProfilePicUpload() {
+    const token = localStorage.getItem('accessToken');
+    const fileInput = document.getElementById('up-profile-pic');
+    
+    if (!fileInput.files[0]) return alert("Please select an image first!");
+
+    const formData = new FormData();
+    formData.append('profile_pic', fileInput.files[0]);
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/auth/profile/`, {
+            method: 'PATCH', // Partial update
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+
+        if (res.ok) {
+            alert("Profile picture updated successfully!");
+            fileInput.value = ""; // Clear the input
+            loadProfile(); // Refresh the profile to show the new image
+        } else {
+            const errorData = await res.json();
+            console.error("Upload error:", errorData);
+            alert("Failed to update profile picture. Ensure the server is running.");
+        }
+    } catch (err) {
+        console.error("Network error:", err);
+        alert("A network error occurred.");
+    }
+        }
+    </script>
+</body>
+</html>

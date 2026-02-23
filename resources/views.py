@@ -20,7 +20,7 @@ class MaterialListCreateView(generics.ListCreateAPIView):
         #This links the upload to the logged-in student
         serializer.save(uploader=self.request.user, user=self.request.user)
 
-class CourseListView(generics.ListAPIView):
+class CourseListView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
