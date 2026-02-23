@@ -243,6 +243,7 @@
 
     if(res.ok) {
         const d = await res.json();
+        console.log("Full profile data from server:", d);
         
         // --- 1. Header Updates (Personalized & Bold) ---
         // Using innerHTML so the span color works
@@ -261,7 +262,7 @@
         document.getElementById('prof-img').src = imgUrl;
 
         // --- 3. Badge Logic ---
-        const pts = d.contribution_points || 0;
+        const pts = parseInt(d.contribution_points || 0);
         let badgeHtml = '';
         if (pts >= 5) {
             badgeHtml = '<span class="badge bg-warning text-dark">🏆 Academic Legend</span>';
